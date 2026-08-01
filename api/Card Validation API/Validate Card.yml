@@ -1,0 +1,23 @@
+info:
+  name: Validate Card
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:5000/validate
+  body:
+    type: json
+    data: |-
+      {
+        "cardNumber": "1111111111111",
+        "expMonth": 10,
+        "expYear": 2028
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

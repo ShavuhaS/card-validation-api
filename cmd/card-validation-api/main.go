@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/ShavuhaS/card-validation-api/internal/api"
+	"github.com/ShavuhaS/card-validation-api/internal/card"
 	"github.com/ShavuhaS/card-validation-api/internal/config"
 )
 
@@ -15,16 +17,16 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	mux := &http.ServeMux{}
+	cardService := card.NewValidationService()
 
-	mux.HandleFunc("POST /cards/validate", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello, world!")
-	})
+	cardHandler := api.NewCardHandler(cardService)
+
+	router := api.NewRouter(cardHandler)
 
 	slog.Info("Starting HTTP server...", "port", cfg.Port)
 
 	port := fmt.Sprintf(":%v", cfg.Port)
-	if err := http.ListenAndServe(port, mux); err != nil {
+	if err := http.ListenAndServe(port, router); err != nil {
 		log.Fatalf("Failed to start HTTP server on port %v: %v", cfg.Port, err)
 	}
 }
