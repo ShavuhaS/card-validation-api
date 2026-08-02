@@ -1,6 +1,7 @@
 package card
 
 import (
+	"slices"
 	"time"
 )
 
@@ -64,6 +65,7 @@ type NumberLuhnValidator struct{}
 func (v NumberLuhnValidator) Validate(req *ValidationRequest) *ValidationError {
 	checksum := 0
 	parity := len(req.Number) % 2
+
 	for i, ch := range req.Number {
 		digit := int(ch - '0')
 		if (i % 2) == parity {
@@ -80,4 +82,24 @@ func (v NumberLuhnValidator) Validate(req *ValidationRequest) *ValidationError {
 	}
 
 	return nil
+}
+
+type NumberMIIValidator struct{
+	financialMiis []byte
+}
+
+func NewNumberMIIValidator() NumberMIIValidator {
+	return NumberMIIValidator{
+		financialMiis: []byte{'3', '4', '5', '6'},
+	}
+}
+
+func (v NumberMIIValidator) Validate(req *ValidationRequest) *ValidationError {
+	mii := req.Number[0]
+
+	if slices.Contains(v.financialMiis, mii) {
+		return nil
+	}
+
+	return ErrMIICheckFailed
 }

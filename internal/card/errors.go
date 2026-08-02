@@ -32,8 +32,13 @@ var ErrInvalidNumberCharacters = &ValidationError{
 	Message: "Invalid card number characters. Card number may only contain numeric digits 0-9",
 }
 
-var ErrLuhnCheckFailed = &ValidationError{
+var ErrMIICheckFailed = &ValidationError{
 	Code: "006",
+	Message: "Invalid card number. MII is not supported",
+}
+
+var ErrLuhnCheckFailed = &ValidationError{
+	Code: "007",
 	Message: "Invalid card number. Luhn's algorithm check failed",
 }
 

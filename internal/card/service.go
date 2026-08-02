@@ -14,6 +14,7 @@ func NewValidationService() ValidationService {
 			ExpirationDateValidator{},
 			NumberLengthValidator{},
 			NumberCharsetValidator{},
+			NewNumberMIIValidator(),
 			NumberLuhnValidator{},
 		},
 	}
