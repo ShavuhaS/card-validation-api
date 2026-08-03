@@ -21,7 +21,6 @@ func NewValidationService() (ValidationService, error) {
 			ExpirationDateValidator{},
 			NumberLengthValidator{},
 			NumberCharsetValidator{},
-			NewNumberMIIValidator(),
 			NumberLuhnValidator{},
 			NewNumberIINValidator(networkStorage),
 			NewIINToNumberLengthValidator(networkStorage),

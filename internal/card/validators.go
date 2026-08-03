@@ -84,26 +84,6 @@ func (v NumberLuhnValidator) Validate(req *ValidationRequest) *ValidationError {
 	return nil
 }
 
-type NumberMIIValidator struct {
-	financialMiis []byte
-}
-
-func NewNumberMIIValidator() *NumberMIIValidator {
-	return &NumberMIIValidator{
-		financialMiis: []byte{'3', '4', '5', '6'},
-	}
-}
-
-func (v *NumberMIIValidator) Validate(req *ValidationRequest) *ValidationError {
-	mii := req.Number[0]
-
-	if slices.Contains(v.financialMiis, mii) {
-		return nil
-	}
-
-	return ErrMIICheckFailed
-}
-
 type NumberIINValidator struct {
 	networkStorage NetworkStorage
 }

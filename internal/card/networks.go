@@ -10,16 +10,16 @@ import (
 
 const MaxIINLength = 8
 
-type CardIssuer int
+type CardIssuer string
 
 const (
-	Visa CardIssuer = iota
-	Mastercard
-	AmericanExpress
-	Discover
-	DinersClubInternational
-	JCB
-	UnionPay
+	Visa                    CardIssuer = "Visa"
+	Mastercard              CardIssuer = "Mastercard"
+	AmericanExpress         CardIssuer = "American Express"
+	Discover                CardIssuer = "Discover"
+	DinersClubInternational CardIssuer = "Diners Club International"
+	JCB                     CardIssuer = "JCB"
+	UnionPay                CardIssuer = "UnionPay"
 )
 
 type IINRange struct {
