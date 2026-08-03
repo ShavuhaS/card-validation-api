@@ -284,3 +284,103 @@ func TestNumberMIIValidator(t *testing.T) {
 		})
 	}
 }
+
+type mockNetworkStorage struct {
+	findIssuer       func(iin string) (CardIssuer, bool)
+	getNumberLengths func(issuer CardIssuer) []int
+}
+
+func (m *mockNetworkStorage) FindIssuer(iin string) (CardIssuer, bool) {
+	return m.findIssuer(iin)
+}
+
+func (m *mockNetworkStorage) GetNumberLengths(issuer CardIssuer) []int {
+	return m.getNumberLengths(issuer)
+}
+
+func TestNumberIINValidator(t *testing.T) {
+	mockStorage := &mockNetworkStorage{
+		findIssuer: func(iin string) (CardIssuer, bool) {
+			if iin == "41111111" {
+				return Visa, true
+			}
+			return Visa, false
+		},
+	}
+	v := NewNumberIINValidator(mockStorage)
+
+	tests := []struct {
+		name          string
+		request       *ValidationRequest
+		expectedError *ValidationError
+	}{
+		{
+			name:          "Valid IIN",
+			request:       &ValidationRequest{Number: "4111111111111111"},
+			expectedError: nil,
+		},
+		{
+			name:          "Invalid IIN",
+			request:       &ValidationRequest{Number: "0000000000000000"},
+			expectedError: ErrIINIsInvalid,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := v.Validate(tt.request)
+			if err != tt.expectedError {
+				t.Errorf("NumberIINValidator.Validate(): expected %v, got %v", tt.expectedError, err)
+			}
+		})
+	}
+}
+
+func TestIINToNumberLengthValidator(t *testing.T) {
+	mockStorage := &mockNetworkStorage{
+		findIssuer: func(iin string) (CardIssuer, bool) {
+			if iin == "41111111" {
+				return Visa, true
+			}
+			return Visa, false
+		},
+		getNumberLengths: func(issuer CardIssuer) []int {
+			if issuer == Visa {
+				return []int{16}
+			}
+			return []int{}
+		},
+	}
+	v := NewIINToNumberLengthValidator(mockStorage)
+
+	tests := []struct {
+		name          string
+		request       *ValidationRequest
+		expectedError *ValidationError
+	}{
+		{
+			name:          "Valid IIN and valid length",
+			request:       &ValidationRequest{Number: "4111111111111111"},
+			expectedError: nil,
+		},
+		{
+			name:          "Valid IIN but invalid length",
+			request:       &ValidationRequest{Number: "411111111111111"},
+			expectedError: ErrInvalidNumberLengthForIIN,
+		},
+		{
+			name:          "Invalid IIN",
+			request:       &ValidationRequest{Number: "0000000000000000"},
+			expectedError: ErrIINIsInvalid,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := v.Validate(tt.request)
+			if err != tt.expectedError {
+				t.Errorf("IINToNumberLengthValidator.Validate(): expected %v, got %v", tt.expectedError, err)
+			}
+		})
+	}
+}
