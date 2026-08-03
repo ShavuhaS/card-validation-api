@@ -7,7 +7,7 @@ import (
 
 func NewRouter(cardHandler *CardHandler) *http.ServeMux {
 	mux := &http.ServeMux{}
-	
+
 	mux.HandleFunc("POST /validate", cardHandler.HandleValidate)
 
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {

@@ -27,4 +27,3 @@ func (h *CardHandler) HandleValidate(w http.ResponseWriter, r *http.Request) {
 	response := card.NewValidationResponse(err)
 	respondJSON(w, http.StatusOK, response)
 }
-

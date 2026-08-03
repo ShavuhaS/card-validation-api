@@ -84,17 +84,17 @@ func (v NumberLuhnValidator) Validate(req *ValidationRequest) *ValidationError {
 	return nil
 }
 
-type NumberMIIValidator struct{
+type NumberMIIValidator struct {
 	financialMiis []byte
 }
 
-func NewNumberMIIValidator() NumberMIIValidator {
-	return NumberMIIValidator{
+func NewNumberMIIValidator() *NumberMIIValidator {
+	return &NumberMIIValidator{
 		financialMiis: []byte{'3', '4', '5', '6'},
 	}
 }
 
-func (v NumberMIIValidator) Validate(req *ValidationRequest) *ValidationError {
+func (v *NumberMIIValidator) Validate(req *ValidationRequest) *ValidationError {
 	mii := req.Number[0]
 
 	if slices.Contains(v.financialMiis, mii) {
@@ -102,4 +102,48 @@ func (v NumberMIIValidator) Validate(req *ValidationRequest) *ValidationError {
 	}
 
 	return ErrMIICheckFailed
+}
+
+type NumberIINValidator struct {
+	networkStorage NetworkStorage
+}
+
+func NewNumberIINValidator(networkStorage NetworkStorage) *NumberIINValidator {
+	return &NumberIINValidator{networkStorage: networkStorage}
+}
+
+func (v *NumberIINValidator) Validate(req *ValidationRequest) *ValidationError {
+	iin := req.Number[:MaxIINLength]
+	_, found := v.networkStorage.FindIssuer(iin)
+
+	if !found {
+		return ErrIINIsInvalid
+	}
+
+	return nil
+}
+
+type IINToNumberLengthValidator struct {
+	networkStorage NetworkStorage
+}
+
+func NewIINToNumberLengthValidator(networkStorage NetworkStorage) *IINToNumberLengthValidator {
+	return &IINToNumberLengthValidator{networkStorage: networkStorage}
+}
+
+func (v *IINToNumberLengthValidator) Validate(req *ValidationRequest) *ValidationError {
+	iin := req.Number[:MaxIINLength]
+	issuer, found := v.networkStorage.FindIssuer(iin)
+
+	if !found {
+		return ErrIINIsInvalid
+	}
+
+	allowedLengths := v.networkStorage.GetNumberLengths(issuer)
+
+	if !slices.Contains(allowedLengths, len(req.Number)) {
+		return ErrInvalidNumberLengthForIIN
+	}
+
+	return nil
 }

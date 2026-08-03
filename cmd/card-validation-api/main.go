@@ -17,7 +17,10 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	cardService := card.NewValidationService()
+	cardService, err := card.NewValidationService()
+	if err != nil {
+		log.Fatalf("Failed to instantiate card validation service: %v\n", err)
+	}
 
 	cardHandler := api.NewCardHandler(cardService)
 
