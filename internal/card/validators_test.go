@@ -7,9 +7,11 @@ import (
 )
 
 func TestExpirationDateValidator(t *testing.T) {
+	originalTimeNow := timeNow
 	timeNow = func() time.Time {
 		return time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)
 	}
+	defer func() { timeNow = originalTimeNow }()
 
 	tests := []struct {
 		name          string
