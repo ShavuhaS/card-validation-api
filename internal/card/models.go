@@ -1,5 +1,7 @@
 package card
 
+import "fmt"
+
 type ValidationRequest struct {
 	Number   string `json:"cardNumber"`
 	ExpMonth int    `json:"expMonth"`
@@ -9,6 +11,10 @@ type ValidationRequest struct {
 type ValidationError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
+}
+
+func (err *ValidationError) Error() string {
+	return fmt.Sprintf("CardValidationError #%v: %v", err.Code, err.Message)
 }
 
 type ValidationResponse struct {
