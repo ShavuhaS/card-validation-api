@@ -17,6 +17,7 @@ RUN addgroup appgroup && adduser -G appgroup -D appuser
 WORKDIR /app
 
 COPY --from=builder --chown=appuser:appgroup /app/card-validation-api .
+COPY --from=builder --chown=appuser:appgroup /app/api ./api
 
 USER appuser:appgroup
 

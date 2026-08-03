@@ -15,5 +15,7 @@ func NewRouter(cardHandler *CardHandler) *http.ServeMux {
 		fmt.Fprintln(w, "Healthy")
 	})
 
+	mux.Handle("GET /api/", http.StripPrefix("/api/", http.FileServer(http.Dir("api/swagger"))))
+
 	return mux
 }

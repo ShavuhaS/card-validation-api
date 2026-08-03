@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: Card Validation API
+  description: API for validating payment card details, including expiration dates, Luhn algorithm checks, and network-specific IIN/length verification.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API.
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Healthy\n"
+  /validate:
+    post:
+      summary: Validate a payment card
+      description: Validates the given payment card number and expiration date against multiple rules including length, character set, Luhn checksum, and IIN support.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+components:
+  schemas:
+    ValidationRequest:
+      type: object
+      required:
+        - cardNumber
+        - expMonth
+        - expYear
+      properties:
+        cardNumber:
+          type: string
+          description: The payment card number to validate (digits only).
+          example: "4111111111111111"
+        expMonth:
+          type: integer
+          description: The expiration month of the card (1-12).
+          example: 12
+        expYear:
+          type: integer
+          description: The expiration year of the card (e.g., 2028).
+          example: 2028
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: >
+            The specific error code. Possible values:
+            - "400": Error parsing body
+            - "001": Invalid expiration month value
+            - "002": Invalid expiration year value
+            - "003": Credit card has expired
+            - "004": Invalid card number length
+            - "005": Invalid card number characters
+            - "006": Invalid card number. MII is not supported
+            - "007": Invalid card number. Luhn's algorithm check failed
+            - "008": Invalid card number. IIN is not supported
+            - "009": Invalid card number. The length doesn't match the IIN
+          example: "007"
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Invalid card number. Luhn's algorithm check failed"
+    ValidationResponse:
+      type: object
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+          description: Indicates whether the provided card details are fully valid.
+          example: false
+        error:
+          $ref: '#/components/schemas/ValidationError'
+          description: Included only if valid is false.

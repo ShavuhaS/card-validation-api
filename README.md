@@ -2,6 +2,11 @@
 
 A Go-based API for validating payment cards.
 
+## API Documentation
+Once the application is running, you can explore the interactive API documentation (Swagger UI) by navigating your browser to:
+**[http://localhost:5000/api/](http://localhost:5000/api/)**
+
+
 ## Requirements
 - [Go 1.26+](https://go.dev/)
 - [Docker](https://www.docker.com/) (Optional)
