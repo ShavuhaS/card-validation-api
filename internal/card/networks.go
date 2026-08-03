@@ -2,6 +2,7 @@ package card
 
 import (
 	"cmp"
+	"math"
 	"slices"
 	"sort"
 	"strconv"
@@ -157,21 +158,25 @@ func (s *networkStorageImpl) FindIssuer(iin string) (issuer CardIssuer, found bo
 		return
 	}
 
-	i := sort.Search(len(s.networkRanges), func(i int) bool {
-		return s.networkRanges[i].start >= iinNumber
+	start := sort.Search(len(s.networkRanges), func(i int) bool {
+		return s.networkRanges[i].end >= iinNumber
 	})
 
-	if i == len(s.networkRanges) {
-		found = false
-		return
+	end := sort.Search(len(s.networkRanges), func(i int) bool {
+		return s.networkRanges[i].start > iinNumber
+	})
+
+	minRngSize := math.MaxInt
+	for i := start; i < end; i++ {
+		rng := s.networkRanges[i]
+		rngSize := rng.end - rng.start + 1
+		if rng.start <= iinNumber && iinNumber <= rng.end && rngSize < minRngSize {
+			minRngSize = rngSize
+			issuer, found = rng.issuer, true
+		}
 	}
 
-	if s.networkRanges[i].end < iinNumber {
-		found = false
-		return
-	}
-
-	return s.networkRanges[i].issuer, true
+	return
 }
 
 func (s *networkStorageImpl) GetNumberLengths(issuer CardIssuer) []int {
